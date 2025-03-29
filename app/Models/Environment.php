@@ -21,4 +21,10 @@ class Environment extends Model
     {
         return $this->belongsTo(Server::class);
     }
+
+    public function serverProvider()
+    {
+        return $this->belongsTo(ServerProvider::class);
+    }
+    
 }
