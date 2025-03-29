@@ -17,9 +17,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('access_key')->nullable();
             $table->string('api_key')->nullable();
-            $table->string('api_url')->nullable();
-            $table->string('api_version')->nullable();
+            // $table->string('api_url')->nullable();
+            // $table->string('api_version')->nullable();
             $table->string('api_endpoint')->nullable();
+            $table->string('ssh_ip_address')->nullable();
+            $table->integer('ssh_port')->nullable();
+            $table->text('public_key')->nullable();
             $table->timestamps();
         });
     }
