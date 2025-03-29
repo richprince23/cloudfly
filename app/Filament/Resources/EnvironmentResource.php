@@ -49,13 +49,34 @@ class EnvironmentResource extends Resource
                     ->live()
                     ->required(),
                 Select::make('region')
-                    ->hidden(fn ($get) => Server::find($get('server_id'))?->serverProvider?->slug === 'vps'),
+                    ->hidden(fn ($get) => Server::find($get('server_id'))?->serverProvider?->slug === 'vps')
+                    ->relationship('region', 'name', function ($query, $get) {
+                        $server = Server::find($get('server_id'));
+                        if ($server) {
+                            return $query->whereHas('serverProvider', function ($query) use ($server) {
+                                $query->where('slug', $server->serverProvider->slug);
+                            });
+                        }
+                        return $query;
+                    })
+                    ->default('t3.micro')
+                    ->live()
+                    ->hidden(fn ($get) => empty($get('server_id'))),
                 TextInput::make('os')
                     ->default('ubuntu-22.04'),
-                TextInput::make('machine_type')
-                    ->default('t3.micro'),
-                    
-                    
+                Select::make('machine_type')
+                    ->relationship('machine', 'name', function ($query, $get) {
+                        $server = Server::find($get('server_id'));
+                        if ($server) {
+                            return $query->whereHas('serverProvider', function ($query) use ($server) {
+                                $query->where('slug', $server->serverProvider->slug);
+                            });
+                        }
+                        return $query;
+                    })
+                    ->default('t3.micro')
+                    ->live()
+                    ->hidden(fn ($get) => empty($get('server_id'))),
             ]);
     }
 
