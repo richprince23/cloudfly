@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Server;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Environment;
+use App\Models\ServerProvider;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -32,7 +35,7 @@ class EnvironmentResource extends Resource
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255)->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/'),
-                TextInput::make('description')
+                Textarea::make('description')
                     ->maxLength(255),
                 Select::make('status')
                     ->options([
@@ -42,8 +45,11 @@ class EnvironmentResource extends Resource
                     ->default('inactive'),
                 Select::make('server_id')
                     ->relationship('server', 'name')
-                    ->default('vps'),
-                // TextInput::make('region')->requiredIf('server_id', 'vps', false),
+                    ->default('vps')
+                    ->live()
+                    ->required(),
+                Select::make('region')
+                    ->hidden(fn ($get) => Server::find($get('server_id'))?->serverProvider?->slug === 'vps'),
                 TextInput::make('os')
                     ->default('ubuntu-22.04'),
                 TextInput::make('machine_type')
